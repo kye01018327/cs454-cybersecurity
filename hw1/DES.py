@@ -210,7 +210,7 @@ def des_rounds(l_init, r_init, round_keys):
 
 # Combine halves
 def combine(l, r):
-    return (r << 32) | l
+    return (l << 32) | r
 
 
 # Final permutation
@@ -227,7 +227,7 @@ def encrypt(input):
     l, r = split(block)
     round_keys = generate_round_keys(input['key'])
     l, r = des_rounds(l, r, round_keys)
-    block = combine(l, r)
+    block = combine(r, l)
     cipher = final_permutation(block)
     return cipher
 
@@ -237,7 +237,7 @@ def decrypt(input):
     l, r = split(block)
     round_keys = generate_round_keys(input['key'])
     l, r = des_rounds(l, r, round_keys[::-1])
-    block = combine(l, r)
+    block = combine(r, l)
     plain = final_permutation(block)
     return plain
 
@@ -252,5 +252,4 @@ elif input['operation'] == 'decryption':
     block = decrypt(input)
 
 print(hex(block))
-
 
