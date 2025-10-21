@@ -1,4 +1,7 @@
-import numpy as np
+# CS454 HW1
+# Kevin Ye
+
+import sys
 
 # Load data
 def load_keyfile(path):
@@ -52,49 +55,41 @@ E_TABLE = [
 ]
 
 S_BOXES = [
-    # S1
     [[14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7],
      [0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8],
      [4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0],
      [15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13]],
 
-    # S2
     [[15, 1, 8, 14, 6, 11, 3, 4, 9, 7, 2, 13, 12, 0, 5, 10],
      [3, 13, 4, 7, 15, 2, 8, 14, 12, 0, 1, 10, 6, 9, 11, 5],
      [0, 14, 7, 11, 10, 4, 13, 1, 5, 8, 12, 6, 9, 3, 2, 15],
      [13, 8, 10, 1, 3, 15, 4, 2, 11, 6, 7, 12, 0, 5, 14, 9]],
 
-    # S3
     [[10, 0, 9, 14, 6, 3, 15, 5, 1, 13, 12, 7, 11, 4, 2, 8],
      [13, 7, 0, 9, 3, 4, 6, 10, 2, 8, 5, 14, 12, 11, 15, 1],
      [13, 6, 4, 9, 8, 15, 3, 0, 11, 1, 2, 12, 5, 10, 14, 7],
      [1, 10, 13, 0, 6, 9, 8, 7, 4, 15, 14, 3, 11, 5, 2, 12]],
 
-    # S4
     [[7, 13, 14, 3, 0, 6, 9, 10, 1, 2, 8, 5, 11, 12, 4, 15],
      [13, 8, 11, 5, 6, 15, 0, 3, 4, 7, 2, 12, 1, 10, 14, 9],
      [10, 6, 9, 0, 12, 11, 7, 13, 15, 1, 3, 14, 5, 2, 8, 4],
      [3, 15, 0, 6, 10, 1, 13, 8, 9, 4, 5, 11, 12, 7, 2, 14]],
 
-    # S5
     [[2, 12, 4, 1, 7, 10, 11, 6, 8, 5, 3, 15, 13, 0, 14, 9],
      [14, 11, 2, 12, 4, 7, 13, 1, 5, 0, 15, 10, 3, 9, 8, 6],
      [4, 2, 1, 11, 10, 13, 7, 8, 15, 9, 12, 5, 6, 3, 0, 14],
      [11, 8, 12, 7, 1, 14, 2, 13, 6, 15, 0, 9, 10, 4, 5, 3]],
 
-    # S6
     [[12, 1, 10, 15, 9, 2, 6, 8, 0, 13, 3, 4, 14, 7, 5, 11],
      [10, 15, 4, 2, 7, 12, 9, 5, 6, 1, 13, 14, 0, 11, 3, 8],
      [9, 14, 15, 5, 2, 8, 12, 3, 7, 0, 4, 10, 1, 13, 11, 6],
      [4, 3, 2, 12, 9, 5, 15, 10, 11, 14, 1, 7, 6, 0, 8, 13]],
 
-    # S7
     [[4, 11, 2, 14, 15, 0, 8, 13, 3, 12, 9, 7, 5, 10, 6, 1],
      [13, 0, 11, 7, 4, 9, 1, 10, 14, 3, 5, 12, 2, 15, 8, 6],
      [1, 4, 11, 13, 12, 3, 7, 14, 10, 15, 6, 8, 0, 5, 9, 2],
      [6, 11, 13, 8, 1, 4, 10, 7, 9, 5, 0, 15, 14, 2, 3, 12]],
 
-    # S8
     [[13, 2, 8, 4, 6, 15, 11, 1, 10, 9, 3, 14, 5, 0, 12, 7],
      [1, 15, 13, 8, 10, 3, 7, 4, 12, 5, 6, 11, 0, 14, 9, 2],
      [7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8],
@@ -139,74 +134,129 @@ SHIFT_SCHEDULE = [1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1]
 
 # Initial Permutation
 def initial_permutation(block):
-    result = 0
+    permutation = 0
     for i, pos in enumerate(IP_TABLE):
-        bit = (block >> (64 - pos)) & 1
-        result |= (bit << (63 - i))
+        # Select one bit at a time
+        bit = (block >> (64 - pos)) & 0x1
 
-    return result
+        # Build permutation right to left
+        permutation |= (bit << (63 - i))
+
+    return permutation
 
 
 # Split into halves
 def split(block):
+    # Shift right 32 bits, select rightmost 32 bits (left 32 bits)
     l = (block >> 32) & 0xFFFFFFFF
+
+    # Select rightmost 32 bits (right 32 bits)
     r = block & 0xFFFFFFFF
+
     return l, r
 
 
 # Feistel rounds
 def expand(r):
+    # Right half integer to binary string
     bits = f"{r:032b}"
+
+    # Expand right half (to 48 bits)
     expanded = ''.join(bits[i-1] for i in E_TABLE)
+
     return int(expanded, 2)
 
-def f(r, k):
-    # Step 1: Expand R (32 → 48 bits)
-    er = expand(r)
+def round_func(r, k):
+    # Expansion (from 32 bits to 48 bits)
+    expanded_r = expand(r)
 
-    # Step 2: XOR with key
-    xored = er ^ k
+    # Mix keys
+    xored = expanded_r ^ k
 
-    # Step 3: Split into 8 chunks of 6 bits and apply S-boxes
+    #  S-box substitution
     s_output = ""
     for i in range(8):
+        # Divide into eight 6-bit chunks
         chunk = (xored >> (42 - 6*i)) & 0x3F
+
+        # Outer bit or inner bit of 6-bit chunk (2-bits)
         row = ((chunk & 0x20) >> 4) | (chunk & 0x01)
+
+        # Select inner bits 2 to 5 (4-bits)
         col = (chunk >> 1) & 0x0F
+
+        # Look up S-box
         val = S_BOXES[i][row][col]
+
+        # Create 32 bit output
         s_output += f"{val:04b}"
 
-    # Step 4: Apply permutation P
+    # Permutation
     permuted = ''.join(s_output[i-1] for i in P_TABLE)
+
     return int(permuted, 2)
 
-def generate_round_keys(key64):
-    key_bits = f"{key64:064b}"
-    permuted = ''.join(key_bits[i-1] for i in PC1)
+def generate_key_schedule(key):
+    # int to binary string (64 bits)
+    key_bits = f"{key:064b}"
+
+    # Permutation using PC1 (56 bits)
+    permuted = ''.join(key_bits[i - 1] for i in PC1)
+
+    # Split permuted key into halves
     C = int(permuted[:28], 2)
     D = int(permuted[28:], 2)
 
-    round_keys = []
+    # Initialize key schedule, list of Cs, Ds
+    round_keys = [] 
+    Cs, Ds = [C], [D]
+
+    # 
     for shift in SHIFT_SCHEDULE:
+        # Circular shift each half using shift schedule
         C = ((C << shift) & 0xFFFFFFF) | (C >> (28 - shift))
         D = ((D << shift) & 0xFFFFFFF) | (D >> (28 - shift))
+
+        # Add new C and D to output lists
+        Cs.append(C)
+        Ds.append(D)
+
+        # Combine halves
         combined = f"{C:028b}{D:028b}"
-        subkey_bits = ''.join(combined[i-1] for i in PC2)
+        
+        # Permute to a 48 bit subkey
+        subkey_bits = ''.join(combined[i - 1] for i in PC2)
+
+        # Add to key schedule
         round_keys.append(int(subkey_bits, 2))
-    return round_keys
+
+    return round_keys, Cs, Ds
 
 def feistel_round(l, r, k):
+    # Swap halves
     new_l = r
-    new_r = l ^ f(r, k)
+
+    # Right is left XOR round_function(r, k)
+    new_r = l ^ round_func(r, k)
+    
     return new_l, new_r
 
-def des_rounds(l_init, r_init, round_keys):
+def des_rounds(l_init, r_init, round_keys, out):
     l, r = l_init, r_init
+    # Print L0, R0
+    print(f"L0={l:032b}", file=out)
+    print(f"R0={r:032b}", file=out)
+
+    # 16 Feistel rounds
     for i in range(16):
         l, r = feistel_round(l, r, round_keys[i])
-        print(l, r)
-    return l, r
 
+        # Print L, R
+        print(f"L{i+1}={l:032b}", file=out)
+        print(f"R{i+1}={r:032b}", file=out)
+    print(file=out)
+
+    return l, r
 
 # Combine halves
 def combine(l, r):
@@ -215,41 +265,91 @@ def combine(l, r):
 
 # Final permutation
 def final_permutation(block):
-    bits = f"{block:064b}"  # convert 64-bit integer to binary string
+    # block integer to binary string
+    bits = f"{block:064b}"
+
+    # Recombine bits based on order by FP table
     permuted = ''.join(bits[i - 1] for i in FP_TABLE)
+
+    # binary string to int
     return int(permuted, 2)
 
 
 # Encrypt Decrypt
-def encrypt(input):
-    block = input['data_block']
-    block = initial_permutation(input['data_block'])
+def encrypt(input_data, out):
+    # Initial permutation
+    block = initial_permutation(input_data['data_block'])
+
+    # Split into halves
     l, r = split(block)
-    round_keys = generate_round_keys(input['key'])
-    l, r = des_rounds(l, r, round_keys)
+
+    # Generate key schedule
+    round_keys, Cs, Ds = generate_key_schedule(input_data['key'])
+
+    # Print key schedule
+    for i, (c, d) in enumerate(zip(Cs, Ds)):
+        print(f"C{i}={c:028b}", file=out)
+        print(f"D{i}={d:028b}", file=out)
+    print(file=out)
+    for i, k in enumerate(round_keys):
+        print(f"K{i+1}={k:048b}", file=out)
+    print(file=out)
+
+    # 16 Feistel rounds
+    l, r = des_rounds(l, r, round_keys, out)
+
+    # Swap and combine halves
     block = combine(r, l)
+
+    # Final permutation, ciphertext
     cipher = final_permutation(block)
+
+    print(f"Result={cipher:016X}", file=out)
     return cipher
 
-def decrypt(input):
-    block = input['data_block']
-    block = initial_permutation(block)
+def decrypt(input_data, out):
+    # Initial permutation
+    block = initial_permutation(input_data['data_block'])
+    
+    # Split into halves
     l, r = split(block)
-    round_keys = generate_round_keys(input['key'])
-    l, r = des_rounds(l, r, round_keys[::-1])
+
+    # Generate key schedule
+    round_keys, Cs, Ds = generate_key_schedule(input_data['key'])
+
+    # Print key schedule
+    for i, (c, d) in enumerate(zip(Cs, Ds)):
+        print(f"C{i}={c:028b}", file=out)
+        print(f"D{i}={d:028b}", file=out)
+    print(file=out)
+    for i, k in enumerate(reversed(round_keys)):
+        print(f"K{i+1}={k:048b}", file=out)
+    print(file=out)
+
+    # 16 Feistel rounds, key schedule reversed
+    l, r = des_rounds(l, r, round_keys[::-1], out)
+
+    # Swap and combine halves
     block = combine(r, l)
+
+    # Final permutation, plaintext
     plain = final_permutation(block)
+
+    print(f"Result={plain:016X}", file=out)
     return plain
 
 
 # Execution
-filename = input("Enter 'encryption' or 'decryption': ")
-input = load_keyfile(f'sample_input_{filename}.txt')
+if __name__ == "__main__":
+    input_path, output_path = sys.argv[1], sys.argv[2]
+    input_data = load_keyfile(input_path)
 
-if input['operation'] == 'encryption':
-    block = encrypt(input)
-elif input['operation'] == 'decryption':
-    block = decrypt(input)
+    # Output
+    with open(output_path, "w") as output:
+        # Encrypt or decrypt based on operation
+        if input_data['operation'] == "encryption":
+            encrypt(input_data, output)
+        elif input_data['operation'] == "decryption":
+            decrypt(input_data, output)
 
-print(hex(block))
 
