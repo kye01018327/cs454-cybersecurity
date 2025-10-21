@@ -147,7 +147,7 @@ def initial_permutation(block):
     return result
 
 
-# Splitting into halves
+# Split into halves
 def split(block):
     l = (block >> 32) & 0xFFFFFFFF
     r = block & 0xFFFFFFFF
