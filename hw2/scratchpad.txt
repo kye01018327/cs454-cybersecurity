@@ -1,0 +1,3 @@
+# Tasks
+
+Procure AES S-Boxes, implement as a list of lists of ints in utils
