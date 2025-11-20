@@ -12,10 +12,10 @@ def sub_bytes(input_matrix: list[list[int]]) -> list[list[int]]:
     transformed_matrix = []
     for row in input_matrix:
         transformed_row = []
-        for word in row:
-            # Use left and right bytes for selecting rows and columns
-            left_byte = word >> 4
-            right_byte = word & 0xf
+        for byte in row:
+            # Use left and right nibbles for selecting rows and columns
+            left_byte = byte >> 4
+            right_byte = byte & 0xf
             transformed_row.append(S_BOX[left_byte][right_byte])
         transformed_matrix.append(transformed_row)
     return transformed_matrix
@@ -61,9 +61,9 @@ def add_round_key(input_matrix: list[list[int]], key_matrix: list[list[int]]) ->
     transformed_matrix = []
     for state_row, key_row in zip(input_matrix, key_matrix):
         transformed_row = []
-        for state_word, key_word in zip(state_row, key_row):
-            transformed_word = state_word ^ key_word
-            transformed_row.append(transformed_word)
+        for state_byte, key_byte in zip(state_row, key_row):
+            transformed_byte = state_byte ^ key_byte
+            transformed_row.append(transformed_byte)
         transformed_matrix.append(transformed_row)
     return transformed_matrix
 
