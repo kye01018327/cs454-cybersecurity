@@ -9,21 +9,21 @@ AES functions
 def sub_bytes(input_matrix: list[list[int]]) -> list[list[int]]:
     # Accept a 4 by 4 matrix representing the state
     # Use the AES S-box to substitute each byte in the state
-    transformed_block = []
+    transformed_matrix = []
     for row in input_matrix:
-        output_row = []
+        transformed_row = []
         for word in row:
             # Use left and right bytes for selecting rows and columns
             left_byte = word >> 4
             right_byte = word & 0xf
-            output_row.append(S_BOX[left_byte][right_byte])
-        transformed_block.append(output_row)
-    return transformed_block
+            transformed_row.append(S_BOX[left_byte][right_byte])
+        transformed_matrix.append(transformed_row)
+    return transformed_matrix
 
 
 def shift_rows(input_matrix: list[list[int]]) -> list[list[int]]:
     # Accept a 4 by 4 matrix state matrix as input
-    transformed_block = []
+    transformed_matrix = []
     # Shift the rows as per AES specification
     # Leave the 1st row of State unaltered
     
@@ -41,12 +41,12 @@ def shift_rows(input_matrix: list[list[int]]) -> list[list[int]]:
     fourth_row = fourth_row[3:] + fourth_row[:3]
 
     # Construct transformed block
-    transformed_block.append(first_row)
-    transformed_block.append(second_row)
-    transformed_block.append(third_row)
-    transformed_block.append(fourth_row)
+    transformed_matrix.append(first_row)
+    transformed_matrix.append(second_row)
+    transformed_matrix.append(third_row)
+    transformed_matrix.append(fourth_row)
 
-    return transformed_block
+    return transformed_matrix
 
 def mix_columns(input_matrix: list[list[int]]) -> list[list[int]]:
     # Accept a 4 by 4 state matrix as input
@@ -55,8 +55,18 @@ def mix_columns(input_matrix: list[list[int]]) -> list[list[int]]:
         pass
     
 
-def add_round_key(input_matrix: list[list[int]], key_matrix):
-    pass
+def add_round_key(input_matrix: list[list[int]], key_matrix: list[list[int]]) -> list[list[int]]:
+    # Accept a 4 by 4 state matrix as input
+    # Perform a bitwise XOR between the state and the round key.
+    transformed_matrix = []
+    for state_row, key_row in zip(input_matrix, key_matrix):
+        transformed_row = []
+        for state_word, key_word in zip(state_row, key_row):
+            transformed_word = state_word ^ key_word
+            transformed_row.append(transformed_word)
+        transformed_matrix.append(transformed_row)
+    return transformed_matrix
+
 
 
 def key_expansion():
