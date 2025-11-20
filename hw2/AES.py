@@ -1,9 +1,20 @@
-
+from utils import *
 
 # Functions
 def sub_bytes(input_block: list[list[int]]) -> list[list[int]]:
     # Accept a 4 by 4 matrix representing the state
-    pass
+    # Use the AES S-box to substitute each byte in the state
+    output_block = []
+    for row in input_block:
+        output_row = []
+        for word in row:
+            # Use left and right bytes for selecting rows and columns
+            left_byte = word >> 4
+            right_byte = word & 0xf
+            output_row.append(S_BOX[left_byte][right_byte])
+        output_block.append(output_row)
+    return output_block
+
 
 def shift_rows():
     pass
