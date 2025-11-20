@@ -1,1 +1,4 @@
 .venv
+.jupyter_ystore.db
+.ipynb_checkpoints
+__pycache__
