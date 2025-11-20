@@ -1,6 +1,11 @@
-from utils import *
+from utils import S_BOX, M
 
-# Functions
+
+"""
+AES functions
+"""
+
+
 def sub_bytes(input_block: list[list[int]]) -> list[list[int]]:
     # Accept a 4 by 4 matrix representing the state
     # Use the AES S-box to substitute each byte in the state
@@ -14,6 +19,7 @@ def sub_bytes(input_block: list[list[int]]) -> list[list[int]]:
             output_row.append(S_BOX[left_byte][right_byte])
         transformed_block.append(output_row)
     return transformed_block
+
 
 def shift_rows(input_block: list[list[int]]) -> list[list[int]]:
     # Accept a 4 by 4 matrix state matrix as input
@@ -42,25 +48,32 @@ def shift_rows(input_block: list[list[int]]) -> list[list[int]]:
 
     return transformed_block
 
-
-
-def mix_columns():
-    pass
+def mix_columns(input_block: list[list[int]]) -> list[list[int]]:
+    # Accept a 4 by 4 state matrix as input
+    # Multiply each column of the state by a fixed polynomial matrix in the Galois Field (GF(2^8))
+    for column in zip(*input_block):
+        pass
+    
 
 def add_round_key():
     pass
 
+
 def key_expansion():
     pass
+
 
 def aes_encrypt():
     pass
 
+
 def aes_test():
     pass
 
+
 def demo_avalanche_effect():
     pass
+
 
 def aes_decrypt():
     pass
