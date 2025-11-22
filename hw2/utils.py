@@ -1,6 +1,7 @@
 # Test data
-plaintext = 0x0123456789abcdef0123456789abcdef
-key = 0x0123456789abcdef0123456789abcdef
+plaintext = 0x3243f6a8885a308d313198a2e0370734
+key = 0x2b7e151628aed2a6abf7158809cf4f3c
+
 
 # AES tables
 S_BOX = [
