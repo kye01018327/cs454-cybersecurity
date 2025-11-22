@@ -1,10 +1,10 @@
-from utils import S_BOX, M
+from utils import S_BOX, M, printb, convert_int_to_matrix, convert_matrix_to_int
 
 
 """
 AES functions
 """
-
+# TODO: verify each function works
 
 def sub_bytes(input_matrix: list[list[int]]) -> list[list[int]]:
     # Accept a 4 by 4 matrix representing the state
@@ -22,7 +22,7 @@ def sub_bytes(input_matrix: list[list[int]]) -> list[list[int]]:
 
 
 def shift_rows(input_matrix: list[list[int]]) -> list[list[int]]:
-    # Accept a 4 by 4 matrix state matrix as input
+    # Accept a 4 by 4 state matrix as input
     transformed_matrix = []
     # Shift the rows as per AES specification
     # Leave the 1st row of State unaltered
@@ -86,9 +86,6 @@ def mix_columns(input_matrix: list[list[int]]) -> list[list[int]]:
     # Transpose matrix to row form
     transformed_matrix = [list(row) for row in zip(*transformed_matrix)]
     return transformed_matrix
-
-        
-        
     
 
 def add_round_key(input_matrix: list[list[int]], key_matrix: list[list[int]]) -> list[list[int]]:
@@ -123,11 +120,21 @@ def key_expansion(key_matrix: list[list[int]]) -> list[list[int]]:
     for i in range(4, 44):
         temp = w[i - 1]
         if i % 4 == 0:
-            temp = sub_word(rot_word(temp))
+            # print("UNCHANGED")
+            # print(temp)
+            temp = rot_word(temp)
+            # print("ROTWORD")
+            # print(temp)
+            temp = sub_word(temp)
+            # print("SUBWORD")
+            # print(temp)
             temp = [a ^ b for a, b in zip(temp, rcon[i // 4 - 1])]
+            # print("XOR with rcon")
+            # print(temp)
         temp = [a ^ b for a, b in zip(w[i - 4], temp)]
+        # print("FINAL WORD")
+        # print(temp)
         w.append(temp)
-    
     return w
     
 
@@ -141,14 +148,36 @@ def sub_word(input_word: list[int]) -> list[int]:
     # Substitute each byte using S-Box
     transformed_word = []
     for byte in input_word:
-        left_byte = byte >> 4
-        right_byte = byte & 0xf
-        transformed_word.append(S_BOX[left_byte][right_byte])
+        left_nibble = byte >> 4
+        right_nibble = byte & 0xf
+        transformed_word.append(S_BOX[left_nibble][right_nibble])
     return transformed_word
 
 
-def aes_encrypt():
-    pass
+def aes_encrypt(plaintext_int: int, key_int: int) -> int:
+    plaintext_matrix = convert_int_to_matrix(plaintext_int)
+    key_matrix = convert_int_to_matrix(key_int)
+    words = key_expansion(key_matrix)
+    round_keys = []
+    for i in range(11):
+        key_words = words[i*4 : i*4 + 4]
+        round_key_matrix = [list(row) for row in zip(*key_words)]
+        round_keys.append(round_key_matrix)
+
+    state_matrix = plaintext_matrix
+    state_matrix = add_round_key(state_matrix, round_keys[0])
+
+    for i in range(1, 10):
+        state_matrix = sub_bytes(state_matrix)
+        state_matrix = shift_rows(state_matrix)
+        state_matrix = mix_columns(state_matrix)
+        state_matrix = add_round_key(state_matrix, round_keys[i])
+
+    state_matrix = sub_bytes(state_matrix)
+    state_matrix = shift_rows(state_matrix)
+    state_matrix = add_round_key(state_matrix, round_keys[10])
+
+    return convert_matrix_to_int(state_matrix)
 
 
 def aes_test():
