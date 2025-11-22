@@ -48,11 +48,47 @@ def shift_rows(input_matrix: list[list[int]]) -> list[list[int]]:
 
     return transformed_matrix
 
+def multiply_by_2(byte: int) -> int:
+        byte <<= 1
+        if byte & 0x100:
+            byte ^= 0x11b
+
+        byte &= 0xff
+        return byte
+
+
+def multiply(factor: int, byte: int) -> int:
+    if factor == 1:
+        return byte
+
+    if factor == 2:
+        return multiply_by_2(byte)
+    
+    if factor == 3:
+        return multiply_by_2(byte) ^ byte
+    
+    return 0
+
+
 def mix_columns(input_matrix: list[list[int]]) -> list[list[int]]:
     # Accept a 4 by 4 state matrix as input
     # Multiply each column of the state by a fixed polynomial matrix in the Galois Field (GF(2^8))
+    transformed_matrix = []
     for column in zip(*input_matrix):
-        pass
+        transformed_col = []
+        for factors in M:
+            transformed_byte = 0
+            for factor, byte in zip(factors, column):
+                transformed_byte ^= multiply(factor, byte)
+            transformed_col.append(transformed_byte)
+        transformed_matrix.append(transformed_col)
+
+    # Transpose matrix to row form
+    transformed_matrix = [list(row) for row in zip(*transformed_matrix)]
+    return transformed_matrix
+
+        
+        
     
 
 def add_round_key(input_matrix: list[list[int]], key_matrix: list[list[int]]) -> list[list[int]]:
