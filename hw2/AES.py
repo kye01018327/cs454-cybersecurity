@@ -68,27 +68,47 @@ def add_round_key(input_matrix: list[list[int]], key_matrix: list[list[int]]) ->
     return transformed_matrix
 
 
-def key_expansion(input_matrix: list[list[int]]):
-    # Accept a 16-byte cipher key
-    # Generate all round keys needed for AES encryption (10 rounds for 128-bit keys).
-    round_keys = []
+def key_expansion(key_matrix: list[list[int]]) -> list[list[int]]:
+    # Copy original key into first 4 words of expanded key
+    w = []
+    for word in key_matrix:
+        w.append(word)
+
+    # Generate rcon
+    rc = 0x01
+    rcon = []
+    for i in range(0, 10):
+        rcon.append([rc, 0, 0, 0])
+        rc <<= 1
+        if rc & 0x100:
+            rc ^= 0x11b
+
+    # Generate next 40 words
+    for i in range(4, 44):
+        temp = w[i - 1]
+        if i % 4 == 0:
+            temp = sub_word(rot_word(temp))
+            temp = [a ^ b for a, b in zip(temp, rcon[i // 4 - 1])]
+        temp = [a ^ b for a, b in zip(w[i - 4], temp)]
+        w.append(temp)
+    
+    return w
     
 
-def rot_word(input_word: list[int]):
+def rot_word(input_word: list[int]) -> list[int]:
     # Circular left shift one time
     transformed_word = input_word[1:] + input_word[:1]
     return transformed_word
 
 
-def sub_word(input_word: list[int]):
-    pass
-
-def sub_word():
-    pass
-
-
-def r_con():
-    pass
+def sub_word(input_word: list[int]) -> list[int]:
+    # Substitute each byte using S-Box
+    transformed_word = []
+    for byte in input_word:
+        left_byte = byte >> 4
+        right_byte = byte & 0xf
+        transformed_word.append(S_BOX[left_byte][right_byte])
+    return transformed_word
 
 
 def aes_encrypt():
