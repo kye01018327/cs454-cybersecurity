@@ -68,8 +68,23 @@ def add_round_key(input_matrix: list[list[int]], key_matrix: list[list[int]]) ->
     return transformed_matrix
 
 
+def key_expansion(input_matrix: list[list[int]]):
+    # Accept a 16-byte cipher key
+    # Generate all round keys needed for AES encryption (10 rounds for 128-bit keys).
+    round_keys = []
+    
 
-def key_expansion():
+def rot_word(input_word: list[list[int]]):
+    # Circular left shift one time
+    transformed_word = input_word[1:] + input_word[:1]
+    return transformed_word
+
+
+def sub_word():
+    pass
+
+
+def r_con():
     pass
 
 
