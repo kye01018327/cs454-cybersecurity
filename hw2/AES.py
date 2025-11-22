@@ -74,11 +74,14 @@ def key_expansion(input_matrix: list[list[int]]):
     round_keys = []
     
 
-def rot_word(input_word: list[list[int]]):
+def rot_word(input_word: list[int]):
     # Circular left shift one time
     transformed_word = input_word[1:] + input_word[:1]
     return transformed_word
 
+
+def sub_word(input_word: list[int]):
+    pass
 
 def sub_word():
     pass
