@@ -4,6 +4,7 @@ from utils import *
 
 textbook_plaintext = 0x0123456789abcdeffedcba9876543210
 textbook_key = 0x0f1571c947d9e8590cb7add6af7f6798
+textbook_ciphertext = 0xff0b844a0853bf7c6934ab4364148fb9
 
 
 def test_int_to_matrix():
@@ -149,3 +150,10 @@ def test_key_expansion():
     ]
     key = key_expansion(key)
     assert key == expected_output
+
+
+def test_aes_encrypt():
+    plaintext = convert_int_to_matrix(textbook_plaintext)
+    key = convert_int_to_matrix(textbook_key)
+    ciphertext = convert_matrix_to_int(aes_encrypt(plaintext, key))
+    assert ciphertext == textbook_ciphertext
