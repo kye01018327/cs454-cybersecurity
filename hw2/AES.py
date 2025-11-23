@@ -93,6 +93,8 @@ def mix_columns(input_matrix: list[list[int]]) -> list[list[int]]:
     
 
 def add_round_key(input_matrix: list[list[int]], key_matrix: list[list[int]]) -> list[list[int]]:
+    printb(input_matrix, 'INPUT')
+    printb(key_matrix, 'CIPHER KEY')
     # Accept a 4 by 4 state matrix as input
     # Perform a bitwise XOR between the state and the round key.
     transformed_matrix = []
@@ -102,6 +104,7 @@ def add_round_key(input_matrix: list[list[int]], key_matrix: list[list[int]]) ->
             transformed_byte = state_byte ^ key_byte
             transformed_row.append(transformed_byte)
         transformed_matrix.append(transformed_row)
+    printb(transformed_matrix, 'OUTPUT')
     return transformed_matrix
 
 
