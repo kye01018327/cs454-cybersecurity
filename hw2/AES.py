@@ -100,9 +100,56 @@ def add_round_key(input_matrix: list[list[int]], key_matrix: list[list[int]]) ->
         transformed_matrix.append(transformed_row)
     return transformed_matrix
 
+def rot_word(input_word: list[int]) -> list[int]:
+    # Circular left shift one time
+    transformed_word = input_word[1:] + input_word[:1]
+    return transformed_word
 
-def key_expansion(key_matrix: list[list[int]]) -> list[list[int]]:
-    pass
+
+def sub_word(input_word: list[int]) -> list[int]:
+    # Substitute each byte using S-Box
+    transformed_word = []
+    for byte in input_word:
+        left_nibble = byte >> 4
+        right_nibble = byte & 0xf
+        transformed_word.append(S_BOX[left_nibble][right_nibble])
+    return transformed_word
+
+
+def key_expansion(key_matrix: list[list[int]]) -> list[list[list[int]]]:
+    # Create key words matrix as the tranpose of key matrix
+    key_words = [list(row) for row in zip(*key_matrix)]
+
+    # w[0..3] as keywords
+    w = [word for word in key_words]
+
+    # Generate rcon
+    rc = 0x01
+    rcon = []
+    for i in range(0, 10):
+        rcon.append([rc, 0, 0, 0])
+        rc <<= 1
+        if rc & 0x100:
+            rc ^= 0x11b
+
+    # Auxiliary Function
+    for i in range(4, 44):
+        temp = w[i - 1]
+        if i % 4 == 0:
+            temp = sub_word(rot_word(temp))
+            temp = [a ^ b for a, b in zip(temp, rcon[i // 4 - 1])]
+        w.append([a ^ b for a, b in zip(w[i - 4], temp)])
+
+    # Convert to list of 4x4 column major keys
+    keys = []
+    for i in range(0, 11):
+        key = []
+        for j in range(0, 4):
+            key.append(w[i*4 + j])
+        key = [list(word) for word in zip(*key)]
+        keys.append(key)
+    return keys
+
 
 
 def aes_encrypt(plaintext: list[list[int]], key: list[list[int]]) -> list[list[int]]:
