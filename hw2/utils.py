@@ -31,7 +31,7 @@ M = [
 ]
 
 # Functions
-def printb(desc: str, block: list[list[int]]) -> None:
+def printb(block: list[list[int]], desc: str) -> None:
     print(desc)
     for row in block:
         print("[", end="")
