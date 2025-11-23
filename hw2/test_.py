@@ -79,7 +79,7 @@ def test_mix_columns():
     assert state == expected_output
 
 def test_key_expansion():
-    key = convert_int_to_matrix(textbook_key)
+    keys = convert_int_to_matrix(textbook_key)
     expected_output = [
         [
             [0x0f, 0x47, 0x0c, 0xaf],
@@ -148,8 +148,8 @@ def test_key_expansion():
             [0x52, 0x4e, 0x20, 0x76]
         ]
     ]
-    key = key_expansion(key)
-    assert key == expected_output
+    keys = key_expansion(key)
+    assert keys == expected_output
 
 
 def test_aes_encrypt():
