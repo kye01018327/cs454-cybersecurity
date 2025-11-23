@@ -7,6 +7,8 @@ AES functions
 # TODO: verify each function works
 
 def sub_bytes(input_matrix: list[list[int]]) -> list[list[int]]:
+    print('SUB BYTES')
+    printb(input_matrix, 'INPUT')
     # Accept a 4 by 4 matrix representing the state
     # Use the AES S-box to substitute each byte in the state
     transformed_matrix = []
@@ -18,6 +20,7 @@ def sub_bytes(input_matrix: list[list[int]]) -> list[list[int]]:
             right_byte = byte & 0xf
             transformed_row.append(S_BOX[left_byte][right_byte])
         transformed_matrix.append(transformed_row)
+    printb(transformed_matrix, 'OUTPUT')
     return transformed_matrix
 
 
@@ -120,20 +123,20 @@ def key_expansion(key_matrix: list[list[int]]) -> list[list[int]]:
     for i in range(4, 44):
         temp = w[i - 1]
         if i % 4 == 0:
-            # print("UNCHANGED")
-            # print(temp)
+            print("UNCHANGED")
+            print(temp)
             temp = rot_word(temp)
-            # print("ROTWORD")
-            # print(temp)
+            print("ROTWORD")
+            print(temp)
             temp = sub_word(temp)
-            # print("SUBWORD")
-            # print(temp)
+            print("SUBWORD")
+            print(temp)
             temp = [a ^ b for a, b in zip(temp, rcon[i // 4 - 1])]
-            # print("XOR with rcon")
-            # print(temp)
+            print("XOR with rcon")
+            print(temp)
         temp = [a ^ b for a, b in zip(w[i - 4], temp)]
-        # print("FINAL WORD")
-        # print(temp)
+        print("FINAL WORD")
+        print(temp)
         w.append(temp)
     return w
     
