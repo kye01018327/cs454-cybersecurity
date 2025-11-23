@@ -76,6 +76,7 @@ def multiply(factor: int, byte: int) -> int:
 
 
 def mix_columns(input_matrix: list[list[int]]) -> list[list[int]]:
+    printb(input_matrix, 'INPUT')
     # Accept a 4 by 4 state matrix as input
     # Multiply each column of the state by a fixed polynomial matrix in the Galois Field (GF(2^8))
     transformed_matrix = []
@@ -87,9 +88,7 @@ def mix_columns(input_matrix: list[list[int]]) -> list[list[int]]:
                 transformed_byte ^= multiply(factor, byte)
             transformed_col.append(transformed_byte)
         transformed_matrix.append(transformed_col)
-
-    # Transpose matrix to row form
-    transformed_matrix = [list(row) for row in zip(*transformed_matrix)]
+    printb(transformed_matrix, 'OUTPUT')
     return transformed_matrix
     
 
