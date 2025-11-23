@@ -42,20 +42,18 @@ def printb(block: list[list[int]], desc: str) -> None:
     print()
 
 
-def convert_int_to_matrix(input: int) -> list: 
-    matrix = []
-    for i in range(4):
-        row = []
-        for j in range(4):
-            shift_amount = (15 - (i + 4 * j)) * 8
-            row.append((input >> shift_amount) & 0xff)
-        matrix.append(row)
+def convert_int_to_matrix(input: int) -> list[list[int]]:
+    bytes_ = input.to_bytes(16, "big")
+    matrix = [[0]*4 for _ in range(4)]
+    for c in range(4):
+        for r in range(4):
+            matrix[r][c] = bytes_[c*4 + r]
     return matrix
 
 def convert_matrix_to_int(matrix: list[list[int]]) -> int:
-    output_int = 0
-    for i in range(4):
-        for j in range(4):
-            shift_amount = (15 - (i + 4 * j)) * 8
-            output_int |= (matrix[i][j] << shift_amount)
-    return output_int
+    bytes_ = bytearray(16)
+    for c in range(4):
+        for r in range(4):
+            bytes_[c*4 + r] = matrix[r][c]
+    return int.from_bytes(bytes_, "big")
+
