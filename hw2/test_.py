@@ -1,4 +1,3 @@
-import pytest
 from AES import *
 from utils import *
 
