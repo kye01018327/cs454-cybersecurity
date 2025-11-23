@@ -151,9 +151,9 @@ def key_expansion(key_matrix: list[list[int]]) -> list[list[list[int]]]:
     return keys
 
 
-def aes_encrypt(plaintext: list[list[int]], key: list[list[int]]) -> list[list[int]]:
+def aes_encrypt(plaintext: int, key: int) -> int:
     state = convert_int_to_matrix(plaintext)
-    init_key = convert_matrix_to_int(key)
+    init_key = convert_int_to_matrix(key)
     keys = key_expansion(init_key)
     state = add_round_key(state, keys[0])
     # For 9 rounds
@@ -166,7 +166,7 @@ def aes_encrypt(plaintext: list[list[int]], key: list[list[int]]) -> list[list[i
     state = sub_bytes(state)
     state = shift_rows(state)
     state = add_round_key(state, keys[10])
-    printb(state, '')
+    state = convert_matrix_to_int(state)
     return state
 
 
