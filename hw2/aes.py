@@ -152,26 +152,89 @@ def key_expansion(key_matrix: list[list[int]]) -> list[list[list[int]]]:
 
 
 def aes_encrypt(plaintext: int, key: int) -> int:
+    # Initialize state and initial key
     state = convert_int_to_matrix(plaintext)
     init_key = convert_int_to_matrix(key)
+    # Generate key schedule
     keys = key_expansion(init_key)
+    # Add round key
     state = add_round_key(state, keys[0])
-    # For 9 rounds
+    # 9 rounds of SubBytes, ShiftRows, MixColumns, AddRoundKey
     for round_key in keys[1:10]:
         state = sub_bytes(state)
         state = shift_rows(state)
         state = mix_columns(state)
         state = add_round_key(state, round_key)
-    # 10th round
+    # 10th round without MixColumns
     state = sub_bytes(state)
     state = shift_rows(state)
     state = add_round_key(state, keys[10])
+    # Convert state to integer form
     state = convert_matrix_to_int(state)
     return state
 
 
-def demo_avalanche_effect():
-    pass
+def demo_avalanche_effect(plaintext: int, key: int):
+    # Change a single bit in the plaintext while keeping the key constant
+    # Flip right most bit
+    modified_plaintext = plaintext ^ 0x01000000000000000000000000000000
+    # Initialize state and initial key
+    original_state = convert_int_to_matrix(plaintext)
+    modified_state = convert_int_to_matrix(modified_plaintext)
+    init_key = convert_int_to_matrix(key)
+    # Generate key schedule
+    keys = key_expansion(init_key)
+    # Add round key
+    original_state = add_round_key(original_state, keys[0])
+    modified_state = add_round_key(modified_state, keys[0])
+    print('BEFORE ROUNDS ---------------------------------------')
+    printb(original_state, 'ORIGINAL STATE')
+    printb(modified_state, 'MODIFIED STATE')
+    num_bits_different(original_state, modified_state)
+
+    # 9 rounds of SubBytes, ShiftRows, MixColumns, AddRoundKey
+    for i, round_key in enumerate(keys[1:10]):
+        original_state = sub_bytes(original_state)
+        original_state = shift_rows(original_state)
+        original_state = mix_columns(original_state)
+        original_state = add_round_key(original_state, round_key)
+
+        modified_state = sub_bytes(modified_state)
+        modified_state = shift_rows(modified_state)
+        modified_state = mix_columns(modified_state)
+        modified_state = add_round_key(modified_state, round_key)
+        print(f'ROUND {i + 1} ---------------------------------------')
+        printb(original_state, 'ORIGINAL STATE')
+        printb(modified_state, 'MODIFIED STATE')
+        num_bits_different(original_state, modified_state)
+    # 10th round without MixColumns
+    original_state = sub_bytes(original_state)
+    original_state = shift_rows(original_state)
+    original_state = add_round_key(original_state, round_key)
+
+    modified_state = sub_bytes(modified_state)
+    modified_state = shift_rows(modified_state)
+    modified_state = add_round_key(modified_state, round_key)
+    print(f'ROUND 10 ---------------------------------------')
+    printb(original_state, 'ORIGINAL STATE')
+    printb(modified_state, 'MODIFIED STATE')
+    num_bits_different(original_state, modified_state)
+    
+
+def num_bits_different(original_state: list[list[int]], modified_state: list[list[int]]):
+    different_bits = 0
+    for original_word, modified_word in zip(original_state, modified_state):
+        for a, b in zip(original_word, modified_word):
+            # Comparison bit by bit
+            for _ in range(0,8):
+                if a & 0x1 != b & 0x1:
+                    different_bits += 1
+                a >>= 1
+                b >>= 1
+    print(f'Number of bits different: {different_bits}')
+    print()
+
+    
 
 
 def aes_decrypt():
