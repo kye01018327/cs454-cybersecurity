@@ -82,6 +82,9 @@ def mix_columns(input_matrix: list[list[int]]) -> list[list[int]]:
                 transformed_byte ^= multiply(factor, byte)
             transformed_col.append(transformed_byte)
         transformed_matrix.append(transformed_col)
+
+    # Transpose
+    transformed_matrix = [list(row) for row in zip(*transformed_matrix)]
     return transformed_matrix
     
 
@@ -99,11 +102,11 @@ def add_round_key(input_matrix: list[list[int]], key_matrix: list[list[int]]) ->
 
 
 def key_expansion(key_matrix: list[list[int]]) -> list[list[int]]:
-    # Transpose key matrix
-    transposed_matrix = [list(row) for row in zip(*key_matrix)]
+    # # Transpose key matrix
+    # transposed_matrix = [list(row) for row in zip(*key_matrix)]
     # Copy original key into first 4 words of expanded key
     w = []
-    for word in transposed_matrix:
+    for word in key_matrix:
         w.append(word)
 
     # Generate rcon
@@ -143,16 +146,14 @@ def sub_word(input_word: list[int]) -> list[int]:
     return transformed_word
 
 
-def aes_encrypt(plaintext_int: int, key_int: int) -> int:
-    plaintext_matrix = convert_int_to_matrix(plaintext_int)
-    key_matrix = convert_int_to_matrix(key_int)
-    words = key_expansion(key_matrix)
+def aes_encrypt(plaintext: list[list[int]], key: list[list[int]]) -> list[list[int]]:
+    words = key_expansion(key)
     round_keys = []
     for i in range(11):
         key_words = words[i*4 : i*4 + 4]
         round_keys.append(key_words)
 
-    state_matrix = plaintext_matrix
+    state_matrix = plaintext
     state_matrix = add_round_key(state_matrix, round_keys[0])
 
     for i in range(1, 10):
@@ -165,7 +166,7 @@ def aes_encrypt(plaintext_int: int, key_int: int) -> int:
     state_matrix = shift_rows(state_matrix)
     state_matrix = add_round_key(state_matrix, round_keys[10])
 
-    return convert_matrix_to_int(state_matrix)
+    return state_matrix
 
 
 def aes_test():
