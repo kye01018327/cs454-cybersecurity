@@ -1,2 +1,2 @@
 # cs454-cybersecurity
-CS454 Cybersecurity
+compilation of assignments and projects
