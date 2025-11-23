@@ -102,71 +102,11 @@ def add_round_key(input_matrix: list[list[int]], key_matrix: list[list[int]]) ->
 
 
 def key_expansion(key_matrix: list[list[int]]) -> list[list[int]]:
-    # # Transpose key matrix
-    # transposed_matrix = [list(row) for row in zip(*key_matrix)]
-    # Copy original key into first 4 words of expanded key
-    w = []
-    for word in key_matrix:
-        w.append(word)
-
-    # Generate rcon
-    rc = 0x01
-    rcon = []
-    for i in range(0, 10):
-        rcon.append([rc, 0, 0, 0])
-        rc <<= 1
-        if rc & 0x100:
-            rc ^= 0x11b
-
-    # Generate next 40 words
-    for i in range(4, 44):
-        temp = w[i - 1]
-        if i % 4 == 0:
-            temp = rot_word(temp)
-            temp = sub_word(temp)
-            temp = [a ^ b for a, b in zip(temp, rcon[i // 4 - 1])]
-        temp = [a ^ b for a, b in zip(w[i - 4], temp)]
-        w.append(temp)
-    return w
-    
-
-def rot_word(input_word: list[int]) -> list[int]:
-    # Circular left shift one time
-    transformed_word = input_word[1:] + input_word[:1]
-    return transformed_word
-
-
-def sub_word(input_word: list[int]) -> list[int]:
-    # Substitute each byte using S-Box
-    transformed_word = []
-    for byte in input_word:
-        left_nibble = byte >> 4
-        right_nibble = byte & 0xf
-        transformed_word.append(S_BOX[left_nibble][right_nibble])
-    return transformed_word
+    pass
 
 
 def aes_encrypt(plaintext: list[list[int]], key: list[list[int]]) -> list[list[int]]:
-    words = key_expansion(key)
-    round_keys = []
-    for i in range(11):
-        key_words = words[i*4 : i*4 + 4]
-        round_keys.append(key_words)
-
-    state_matrix = plaintext
-    state_matrix = add_round_key(state_matrix, round_keys[0])
-
-    for i in range(1, 10):
-        state_matrix = sub_bytes(state_matrix)
-        state_matrix = shift_rows(state_matrix)
-        state_matrix = mix_columns(state_matrix)
-        state_matrix = add_round_key(state_matrix, round_keys[i])
-
-    state_matrix = sub_bytes(state_matrix)
-    state_matrix = shift_rows(state_matrix)
-    state_matrix = add_round_key(state_matrix, round_keys[10])
-
-    return state_matrix
+    pass
 
 
 def aes_test():
