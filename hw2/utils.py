@@ -31,7 +31,8 @@ M = [
 ]
 
 # Functions
-def printb(block: list[list[int]]) -> None:
+def printb(desc: str, block: list[list[int]]) -> None:
+    print(desc)
     for row in block:
         print("[", end="")
         for byte in row:
