@@ -25,6 +25,7 @@ def sub_bytes(input_matrix: list[list[int]]) -> list[list[int]]:
 
 
 def shift_rows(input_matrix: list[list[int]]) -> list[list[int]]:
+    printb(input_matrix, 'INPUT')
     # Accept a 4 by 4 state matrix as input
     transformed_matrix = []
     # Shift the rows as per AES specification
@@ -49,6 +50,7 @@ def shift_rows(input_matrix: list[list[int]]) -> list[list[int]]:
     transformed_matrix.append(third_row)
     transformed_matrix.append(fourth_row)
 
+    printb(transformed_matrix, 'OUTPUT')
     return transformed_matrix
 
 def multiply_by_2(byte: int) -> int:
