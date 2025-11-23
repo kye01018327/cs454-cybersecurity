@@ -169,8 +169,6 @@ def aes_encrypt(plaintext: list[list[int]], key: list[list[int]]) -> list[list[i
     return state
     
 
-
-
 def aes_test():
     pass
 
