@@ -7,8 +7,6 @@ AES functions
 # TODO: verify each function works
 
 def sub_bytes(input_matrix: list[list[int]]) -> list[list[int]]:
-    print('SUB BYTES')
-    printb(input_matrix, 'INPUT')
     # Accept a 4 by 4 matrix representing the state
     # Use the AES S-box to substitute each byte in the state
     transformed_matrix = []
@@ -20,12 +18,10 @@ def sub_bytes(input_matrix: list[list[int]]) -> list[list[int]]:
             right_byte = byte & 0xf
             transformed_row.append(S_BOX[left_byte][right_byte])
         transformed_matrix.append(transformed_row)
-    printb(transformed_matrix, 'OUTPUT')
     return transformed_matrix
 
 
 def shift_rows(input_matrix: list[list[int]]) -> list[list[int]]:
-    printb(input_matrix, 'INPUT')
     # Accept a 4 by 4 state matrix as input
     transformed_matrix = []
     # Shift the rows as per AES specification
@@ -50,7 +46,6 @@ def shift_rows(input_matrix: list[list[int]]) -> list[list[int]]:
     transformed_matrix.append(third_row)
     transformed_matrix.append(fourth_row)
 
-    printb(transformed_matrix, 'OUTPUT')
     return transformed_matrix
 
 def multiply_by_2(byte: int) -> int:
@@ -76,7 +71,6 @@ def multiply(factor: int, byte: int) -> int:
 
 
 def mix_columns(input_matrix: list[list[int]]) -> list[list[int]]:
-    printb(input_matrix, 'INPUT')
     # Accept a 4 by 4 state matrix as input
     # Multiply each column of the state by a fixed polynomial matrix in the Galois Field (GF(2^8))
     transformed_matrix = []
@@ -88,13 +82,10 @@ def mix_columns(input_matrix: list[list[int]]) -> list[list[int]]:
                 transformed_byte ^= multiply(factor, byte)
             transformed_col.append(transformed_byte)
         transformed_matrix.append(transformed_col)
-    printb(transformed_matrix, 'OUTPUT')
     return transformed_matrix
     
 
 def add_round_key(input_matrix: list[list[int]], key_matrix: list[list[int]]) -> list[list[int]]:
-    printb(input_matrix, 'INPUT')
-    printb(key_matrix, 'CIPHER KEY')
     # Accept a 4 by 4 state matrix as input
     # Perform a bitwise XOR between the state and the round key.
     transformed_matrix = []
@@ -104,14 +95,15 @@ def add_round_key(input_matrix: list[list[int]], key_matrix: list[list[int]]) ->
             transformed_byte = state_byte ^ key_byte
             transformed_row.append(transformed_byte)
         transformed_matrix.append(transformed_row)
-    printb(transformed_matrix, 'OUTPUT')
     return transformed_matrix
 
 
 def key_expansion(key_matrix: list[list[int]]) -> list[list[int]]:
+    # Transpose key matrix
+    transposed_matrix = [list(row) for row in zip(*key_matrix)]
     # Copy original key into first 4 words of expanded key
     w = []
-    for word in key_matrix:
+    for word in transposed_matrix:
         w.append(word)
 
     # Generate rcon
@@ -127,20 +119,10 @@ def key_expansion(key_matrix: list[list[int]]) -> list[list[int]]:
     for i in range(4, 44):
         temp = w[i - 1]
         if i % 4 == 0:
-            print("UNCHANGED")
-            print(temp)
             temp = rot_word(temp)
-            print("ROTWORD")
-            print(temp)
             temp = sub_word(temp)
-            print("SUBWORD")
-            print(temp)
             temp = [a ^ b for a, b in zip(temp, rcon[i // 4 - 1])]
-            print("XOR with rcon")
-            print(temp)
         temp = [a ^ b for a, b in zip(w[i - 4], temp)]
-        print("FINAL WORD")
-        print(temp)
         w.append(temp)
     return w
     
@@ -168,8 +150,7 @@ def aes_encrypt(plaintext_int: int, key_int: int) -> int:
     round_keys = []
     for i in range(11):
         key_words = words[i*4 : i*4 + 4]
-        round_key_matrix = [list(row) for row in zip(*key_words)]
-        round_keys.append(round_key_matrix)
+        round_keys.append(key_words)
 
     state_matrix = plaintext_matrix
     state_matrix = add_round_key(state_matrix, round_keys[0])
