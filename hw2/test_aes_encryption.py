@@ -1,4 +1,4 @@
-from AES import *
+from aes import *
 from utils import *
 
 def test_aes_encryption():

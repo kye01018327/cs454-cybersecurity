@@ -1,4 +1,4 @@
-from AES import *
+from aes import *
 from utils import *
 
 textbook_plaintext = 0x0123456789abcdeffedcba9876543210
