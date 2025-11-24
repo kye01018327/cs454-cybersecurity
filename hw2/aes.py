@@ -1,4 +1,4 @@
-from utils import S_BOX, M, printb, convert_int_to_matrix, convert_matrix_to_int, INVERSE_S_BOX
+from utils import S_BOX, M, printb, convert_int_to_matrix, convert_matrix_to_int, INVERSE_S_BOX, INV_M
 
 
 """
@@ -129,7 +129,21 @@ def mix_columns(input_matrix: list[list[int]]) -> list[list[int]]:
     # Transpose
     transformed_matrix = [list(row) for row in zip(*transformed_matrix)]
     return transformed_matrix
-    
+
+
+def inv_mix_columns(input_matrix: list[list[int]]) -> list[list[int]]:
+    transformed_matrix = []
+    for column in zip(*input_matrix):
+        transformed_col = []
+        for factors in INV_M:
+            transformed_byte = 0
+            for factor, byte in zip(factors, column):
+                transformed_byte ^= multiply(factor, byte)
+            transformed_col.append(transformed_byte)
+        transformed_matrix.append(transformed_col)
+    transformed_matrix = [list(row) for row in zip(*transformed_matrix)]
+    return transformed_matrix
+
 
 def add_round_key(input_matrix: list[list[int]], key_matrix: list[list[int]]) -> list[list[int]]:
     # Accept a 4 by 4 state matrix as input
