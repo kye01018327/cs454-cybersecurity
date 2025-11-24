@@ -1,4 +1,4 @@
-from utils import S_BOX, M, printb, convert_int_to_matrix, convert_matrix_to_int
+from utils import S_BOX, M, printb, convert_int_to_matrix, convert_matrix_to_int, INVERSE_S_BOX
 
 
 """
@@ -14,9 +14,21 @@ def sub_bytes(input_matrix: list[list[int]]) -> list[list[int]]:
         transformed_row = []
         for byte in row:
             # Use left and right nibbles for selecting rows and columns
-            left_byte = byte >> 4
-            right_byte = byte & 0xf
-            transformed_row.append(S_BOX[left_byte][right_byte])
+            left_nibble = byte >> 4
+            right_nibble = byte & 0xf
+            transformed_row.append(S_BOX[left_nibble][right_nibble])
+        transformed_matrix.append(transformed_row)
+    return transformed_matrix
+
+
+def inv_sub_bytes(state):
+    transformed_matrix = []
+    for row in state:
+        transformed_row = []
+        for byte in row:
+            left_nibble = byte >> 4
+            right_nibble = byte & 0xf            
+            transformed_row.append(INVERSE_S_BOX[left_nibble][right_nibble])
         transformed_matrix.append(transformed_row)
     return transformed_matrix
 
