@@ -292,8 +292,24 @@ def num_bits_different(original_state: list[list[int]], modified_state: list[lis
     print()
 
     
+def aes_decrypt(ciphertext: int, key: int) -> int:
+    state = convert_int_to_matrix(ciphertext)
+    init_key = convert_int_to_matrix(key)
+    keys = key_expansion(init_key)
 
+    # Initial round
+    state = add_round_key(state, keys[10])
+    state = inv_shift_rows(state)
+    state = inv_sub_bytes(state)
 
-def aes_decrypt():
-    pass
+    # 9 rounds
+    for round_key in reversed(keys[1:10]):
+        state = add_round_key(state, round_key)
+        state = inv_mix_columns(state)
+        state = inv_shift_rows(state)
+        state = inv_sub_bytes(state)
+
+    state = add_round_key(state, keys[0])
+
+    return convert_matrix_to_int(state)
 
