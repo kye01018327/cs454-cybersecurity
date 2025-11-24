@@ -50,6 +50,13 @@ M = [
     [0x03, 0x01, 0x01, 0x02]
 ]
 
+INV_M = [
+    [14, 11, 13, 9],
+    [9, 14, 11, 13],
+    [13, 9, 14, 11],
+    [11, 13, 9, 14],
+]
+
 # Functions
 def printb(block: list[list[int]], desc: str) -> None:
     if desc:
