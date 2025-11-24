@@ -60,6 +60,25 @@ def shift_rows(input_matrix: list[list[int]]) -> list[list[int]]:
 
     return transformed_matrix
 
+def inv_shift_rows(input_matrix: list[list[int]]) -> list[list[int]]:
+    transformed_matrix = []
+    
+    first_row = input_matrix[0]
+    second_row = input_matrix[1]
+    second_row = second_row[-1:] + second_row[:-1]
+    third_row = input_matrix[2]
+    third_row = third_row[-2:] + third_row[:-2]
+    fourth_row = input_matrix[3]
+    fourth_row = fourth_row[-3:] + fourth_row[:-3]
+
+    transformed_matrix.append(first_row)
+    transformed_matrix.append(second_row)
+    transformed_matrix.append(third_row)
+    transformed_matrix.append(fourth_row)
+    
+    return transformed_matrix
+
+
 def multiply_by_2(byte: int) -> int:
         byte <<= 1
         if byte & 0x100:
