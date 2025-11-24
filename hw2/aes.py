@@ -75,7 +75,7 @@ def inv_shift_rows(input_matrix: list[list[int]]) -> list[list[int]]:
     transformed_matrix.append(second_row)
     transformed_matrix.append(third_row)
     transformed_matrix.append(fourth_row)
-    
+
     return transformed_matrix
 
 
@@ -97,6 +97,18 @@ def multiply(factor: int, byte: int) -> int:
     
     if factor == 3:
         return multiply_by_2(byte) ^ byte
+    
+    if factor == 9:
+        return multiply_by_2(multiply_by_2(multiply_by_2(byte))) ^ byte
+    
+    if factor == 11:
+        return multiply_by_2(multiply_by_2(multiply_by_2(byte)) ^ byte) ^ byte
+    
+    if factor == 13:
+        return multiply_by_2(multiply_by_2(multiply_by_2(byte) ^ byte)) ^ byte
+    
+    if factor == 14:
+        return multiply_by_2(multiply_by_2(multiply_by_2(byte) ^ byte) ^ byte)
     
     return 0
 
