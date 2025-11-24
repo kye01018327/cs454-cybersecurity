@@ -6,59 +6,59 @@ AES functions
 """
 # TODO: verify each function works
 
-def sub_bytes(input_matrix: list[list[int]]) -> list[list[int]]:
+def sub_bytes(state: list[list[int]]) -> list[list[int]]:
     # Accept a 4 by 4 matrix representing the state
     # Use the AES S-box to substitute each byte in the state
-    transformed_matrix = []
-    for row in input_matrix:
+    transformed_state = []
+    for row in state:
         transformed_row = []
         for byte in row:
             # Use left and right nibbles for selecting rows and columns
             left_nibble = byte >> 4
             right_nibble = byte & 0xf
             transformed_row.append(S_BOX[left_nibble][right_nibble])
-        transformed_matrix.append(transformed_row)
-    return transformed_matrix
+        transformed_state.append(transformed_row)
+    return transformed_state
 
 
 def inv_sub_bytes(state):
-    transformed_matrix = []
+    transformed_state = []
     for row in state:
         transformed_row = []
         for byte in row:
             left_nibble = byte >> 4
             right_nibble = byte & 0xf            
             transformed_row.append(INVERSE_S_BOX[left_nibble][right_nibble])
-        transformed_matrix.append(transformed_row)
-    return transformed_matrix
+        transformed_state.append(transformed_row)
+    return transformed_state
 
 
-def shift_rows(input_matrix: list[list[int]]) -> list[list[int]]:
+def shift_rows(state: list[list[int]]) -> list[list[int]]:
     # Accept a 4 by 4 state matrix as input
-    transformed_matrix = []
+    transformed_state = []
     # Shift the rows as per AES specification
     # Leave the 1st row of State unaltered
     
-    first_row = input_matrix[0]
+    first_row = state[0]
     # Circular left shift 1 time for 2nd row
-    second_row = input_matrix[1]
+    second_row = state[1]
     second_row = second_row[1:] + second_row[:1]
     
     # Circular left shift 2 times for 3rd row
-    third_row = input_matrix[2]
+    third_row = state[2]
     third_row = third_row[2:] + third_row[:2]
 
     # Circular left shift 3 times for 4th row
-    fourth_row = input_matrix[3]
+    fourth_row = state[3]
     fourth_row = fourth_row[3:] + fourth_row[:3]
 
     # Construct transformed block
-    transformed_matrix.append(first_row)
-    transformed_matrix.append(second_row)
-    transformed_matrix.append(third_row)
-    transformed_matrix.append(fourth_row)
+    transformed_state.append(first_row)
+    transformed_state.append(second_row)
+    transformed_state.append(third_row)
+    transformed_state.append(fourth_row)
 
-    return transformed_matrix
+    return transformed_state
 
 def inv_shift_rows(input_matrix: list[list[int]]) -> list[list[int]]:
     transformed_matrix = []
@@ -113,49 +113,49 @@ def multiply(factor: int, byte: int) -> int:
     return 0
 
 
-def mix_columns(input_matrix: list[list[int]]) -> list[list[int]]:
+def mix_columns(state: list[list[int]]) -> list[list[int]]:
     # Accept a 4 by 4 state matrix as input
     # Multiply each column of the state by a fixed polynomial matrix in the Galois Field (GF(2^8))
-    transformed_matrix = []
-    for column in zip(*input_matrix):
-        transformed_col = []
+    transformed_state = []
+    for column in zip(*state):
+        transformed_column = []
         for factors in M:
             transformed_byte = 0
             for factor, byte in zip(factors, column):
                 transformed_byte ^= multiply(factor, byte)
-            transformed_col.append(transformed_byte)
-        transformed_matrix.append(transformed_col)
+            transformed_column.append(transformed_byte)
+        transformed_state.append(transformed_column)
 
     # Transpose
-    transformed_matrix = [list(row) for row in zip(*transformed_matrix)]
-    return transformed_matrix
+    transformed_state = [list(row) for row in zip(*transformed_state)]
+    return transformed_state
 
 
-def inv_mix_columns(input_matrix: list[list[int]]) -> list[list[int]]:
-    transformed_matrix = []
-    for column in zip(*input_matrix):
-        transformed_col = []
+def inv_mix_columns(state: list[list[int]]) -> list[list[int]]:
+    transformed_state = []
+    for column in zip(*state):
+        transformed_column = []
         for factors in INV_M:
             transformed_byte = 0
             for factor, byte in zip(factors, column):
                 transformed_byte ^= multiply(factor, byte)
-            transformed_col.append(transformed_byte)
-        transformed_matrix.append(transformed_col)
-    transformed_matrix = [list(row) for row in zip(*transformed_matrix)]
-    return transformed_matrix
+            transformed_column.append(transformed_byte)
+        transformed_state.append(transformed_column)
+    transformed_state = [list(row) for row in zip(*transformed_state)]
+    return transformed_state
 
 
-def add_round_key(input_matrix: list[list[int]], key_matrix: list[list[int]]) -> list[list[int]]:
+def add_round_key(state: list[list[int]], key: list[list[int]]) -> list[list[int]]:
     # Accept a 4 by 4 state matrix as input
     # Perform a bitwise XOR between the state and the round key.
-    transformed_matrix = []
-    for state_row, key_row in zip(input_matrix, key_matrix):
+    transformed_state = []
+    for state_row, key_row in zip(state, key):
         transformed_row = []
         for state_byte, key_byte in zip(state_row, key_row):
             transformed_byte = state_byte ^ key_byte
             transformed_row.append(transformed_byte)
-        transformed_matrix.append(transformed_row)
-    return transformed_matrix
+        transformed_state.append(transformed_row)
+    return transformed_state
 
 def rot_word(input_word: list[int]) -> list[int]:
     # Circular left shift one time
@@ -188,6 +188,7 @@ def key_expansion(key_matrix: list[list[int]]) -> list[list[list[int]]]:
         rc <<= 1
         if rc & 0x100:
             rc ^= 0x11b
+        rc &= 0xff
 
     # Auxiliary Function
     for i in range(4, 44):
