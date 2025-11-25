@@ -4,7 +4,7 @@ from utils import S_BOX, M, printb, convert_int_to_matrix, convert_matrix_to_int
 """
 AES functions
 """
-# TODO: verify each function works
+
 
 def sub_bytes(state: list[list[int]]) -> list[list[int]]:
     # Accept a 4 by 4 matrix representing the state
